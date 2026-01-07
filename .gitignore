@@ -1,0 +1,6 @@
+build/
+.vs/
+.vscode/
+.cache/clangd/
+CMakePresets.json
+
