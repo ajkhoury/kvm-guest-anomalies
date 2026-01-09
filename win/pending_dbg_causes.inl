@@ -22,34 +22,15 @@
  * Authors: Aidan Khoury <aidan@aktech.ai>
  */
 
-#include <windows.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <inttypes.h>
-#include "drx.h"
-
-/* Global variables. */
 static uint64_t g_dr6 = 0;
 static uint16_t ss_probe = 0;
 
-void print_dr6(uint64_t dr6)
-{
-	printf("DR6: 0x%" PRIx64 "\n", dr6);
-	printf("    B0 (DR0 hit):     %i\n", (dr6 & DR6_B0_BIT) != 0);
-	printf("    B1 (DR1 hit):     %i\n", (dr6 & DR6_B1_BIT) != 0);
-	printf("    B2 (DR2 hit):     %i\n", (dr6 & DR6_B2_BIT) != 0);
-	printf("    B3 (DR3 hit):     %i\n", (dr6 & DR6_B3_BIT) != 0);
-	printf("    BD (DR access):   %i\n", (dr6 & DR6_BD_BIT) != 0);
-	printf("    BS (single-step): %i\n", (dr6 & DR6_BS_BIT) != 0);
-	printf("    BT (task switch): %i\n", (dr6 & DR6_BT_BIT) != 0);
-}
-
-LONG WINAPI veh_handler(EXCEPTION_POINTERS* info)
+LONG WINAPI pending_dbg_causes_veh(EXCEPTION_POINTERS* info)
 {
 	if (info->ExceptionRecord->ExceptionCode != EXCEPTION_SINGLE_STEP)
 		return EXCEPTION_CONTINUE_SEARCH;
 
-	PCONTEXT ctx = info->ContextRecord;
+	const PCONTEXT ctx = info->ContextRecord;
 	g_dr6 = ctx->Dr6;
 
 	ctx->EFlags &= ~0x100; /* clear trap flag (single-step). */
@@ -60,9 +41,9 @@ LONG WINAPI veh_handler(EXCEPTION_POINTERS* info)
 	return EXCEPTION_CONTINUE_EXECUTION;
 }
 
-int main(void)
+int anomaly_pending_dbg_causes(void)
 {
-	void *veh_handle = AddVectoredExceptionHandler(1, veh_handler);
+	void *const veh_handle = AddVectoredExceptionHandler(1, pending_dbg_causes_veh);
 	if (veh_handle == NULL) {
 		fprintf(stderr, "failed to add veh!");
 		return -1;
