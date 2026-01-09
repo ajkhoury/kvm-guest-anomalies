@@ -23,6 +23,7 @@
 #define PTRACE_WRAPPER_H 1
 #include <errno.h>
 #include <signal.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <sys/ptrace.h>
 #include <sys/types.h>

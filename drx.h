@@ -187,4 +187,16 @@
 #define DR7_LEN3_8_BYTE         (2u << 30) /* LEN3 8-byte length/alignment. */
 #define DR7_LEN3_4_BYTE         (3u << 30) /* LEN3 4-byte length/alignment. */
 
+static inline void print_dr6(uint64_t dr6)
+{
+	printf("DR6: 0x%" PRIx64 "\n", dr6);
+	printf("  B0 (DR0 hit):     %i\n", (dr6 & DR6_B0_BIT) != 0);
+	printf("  B1 (DR1 hit):     %i\n", (dr6 & DR6_B1_BIT) != 0);
+	printf("  B2 (DR2 hit):     %i\n", (dr6 & DR6_B2_BIT) != 0);
+	printf("  B3 (DR3 hit):     %i\n", (dr6 & DR6_B3_BIT) != 0);
+	printf("  BD (DR access):   %i\n", (dr6 & DR6_BD_BIT) != 0);
+	printf("  BS (single-step): %i\n", (dr6 & DR6_BS_BIT) != 0);
+	printf("  BT (task switch): %i\n", (dr6 & DR6_BT_BIT) != 0);
+}
+
 #endif /* _ARCH_X86_DRX_ */
